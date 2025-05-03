@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <title>Snorklefudge - Company page</title>
+  <title>Snorklefudge</title>
   <style>
     html, body {
       margin: 0;
@@ -215,9 +215,6 @@ function countHugeShapes() {
 
 // Get random shape size
 function getShapeSize() {
-  // Skip generating huge shapes during normal createShape() calls
-  // This prevents double-spawning at start and lets us control huge shapes 
-  // entirely through the dedicated methods (createHugeShape and ensureMinHugeShapes)
   
   // Normal distribution for regular shapes
   const r = Math.random();
