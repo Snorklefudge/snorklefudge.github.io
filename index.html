@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Snorklefudge - Company page</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #FAF9F6;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .shape-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .shape {
+      position: absolute;
+      opacity: 0;
+      will-change: transform, opacity;
+      transform-origin: center;
+    }
+
+    .circle {
+      border-radius: 50%;
+    }
+
+    .cursor-indicator {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 5px solid rgba(50, 180, 50, 0.6);
+      background-color: transparent;
+      pointer-events: none;
+      z-index: 100;
+      transform: translate(-50%, -50%);
+      display: block;
+    }
+
+    .toggle-text {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.5);
+      cursor: pointer;
+      z-index: 200;
+      background-color: rgba(250, 249, 246, 0.5);
+      padding: 5px 10px;
+      border-radius: 4px;
+      user-select: none;
+    }
+
+    /* Logo container styles */
+    .logo-container {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      width: 500px;
+      height: 500px;
+      transform: translate(-50%, -50%);
+      z-index: 101;
+      pointer-events: none; /* Allow clicks to pass through */
+    }
+
+    /* Individual logo parts */
+    .logo-shadow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 102;
+      transform: translate(0, 0);
+      will-change: transform;
+      transition: transform 0.15s ease-out;
+      color: #868679ff;
+      opacity: 1;
+    }
+
+    .logo-main { 
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 103;
+      transform: translate(0, 0);
+      will-change: transform;
+      transition: transform 0.15s ease-out;
+      color: whitesmoke;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap">
+  <link rel="icon" href="./logo/favicon.svg" type="image/svg+xml">
+  
+</head>
+<body>
+
+<div class="shape-container" id="shape-container"></div>
+<div class="cursor-indicator" id="cursor-indicator"></div>
+<div class="toggle-text" id="toggle-text">Press "V" to toggle cursor.</div>
+
+<!-- Parallax Logo Container -->
+<div class="logo-container" id="logo-container">
+  
+  <!-- Logo Main - moves more with parallax -->
+  <div class="logo-main" id="logo-main">
+  </div>
+  <!-- Logo Shadow - moves less with parallax -->
+  <div class="logo-shadow" id="logo-shadow">
+  </div>
+
+</div>
+
+<script>
+// Configuration
+const config = {
+  pushRadius: 120,         // Radius of cursor effect
+  pushStrength: 0.008,     // Push strength
+  shapeInterval: 600,      // MS between new shapes
+  shapeColors: {
+    tiny: '#d1d1c9',       // 18px shapes 
+    small: '#d9d9d1',      // 26px shapes
+    medium: '#e1e1d9',     // 42px shapes
+    large: '#ecece4',      // 86px shapes 
+    huge: '#f0f0e8'        // 200-400px shapes 
+  },
+  maxHugeShapes: 2,        // Maximum number of huge shapes on screen
+  minHugeShapes: 1,        // Minimum number of huge shapes on screen
+  parallaxFactor: {
+    logoMain: 0.013,        // Main logo parallax strength (higher = more movement)
+    logoShadow: 0.01       // Shadow parallax strength (lower = less movement)
+  }
+};
+
+// Constants for different shape sizes
+const SHAPE_SIZES = {
+  TINY: 18,
+  SMALL: 26,
+  MEDIUM: 42,
+  LARGE: 86,
+  HUGE: function() { return Math.floor(Math.random() * 201) + 200; } // Random between 200-400px
+};
+
+// Dom elements
+const container = document.getElementById('shape-container');
+const cursor = document.getElementById('cursor-indicator');
+const logoMain = document.getElementById('logo-main');
+const logoShadow = document.getElementById('logo-shadow');
+const logoContainer = document.getElementById('logo-container');
+
+// Tracking variables
+let activeShapes = [];
+const shapeTypes = ['circle', 'square', 'triangle', 'cross'];
+let recentShapeTypesBySize = {
+  [SHAPE_SIZES.TINY]: [],
+  [SHAPE_SIZES.SMALL]: [],
+  [SHAPE_SIZES.MEDIUM]: [],
+  [SHAPE_SIZES.LARGE]: [],
+};
+let lastShapeTime = 0;
+let mouseX = window.innerWidth / 2;  // Start with mouse in the center
+let mouseY = window.innerHeight / 2; // Start with mouse in the center
+let showCursor = true;
+let hugeShapeCount = 0;
+let firstShapeCreated = false;
+
+// ===== Parallax Functions =====
+
+// Update logo position based on mouse position
+function updateLogoParallax() {
+  // Get window dimensions
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
+  
+  // Calculate offset from center (normalized from -1 to 1)
+  const offsetX = (mouseX - (windowWidth / 2)) / (windowWidth / 2);
+  const offsetY = (mouseY - (windowHeight / 2)) / (windowHeight / 2);
+  
+  // Apply to main logo (more movement)
+  const mainOffsetX = -offsetX * config.parallaxFactor.logoMain * windowWidth;
+  const mainOffsetY = -offsetY * config.parallaxFactor.logoMain * windowHeight;
+  logoMain.style.transform = `translate(${mainOffsetX}px, ${mainOffsetY}px)`;
+  
+  // Apply to shadow (less movement)
+  const shadowOffsetX = -offsetX * config.parallaxFactor.logoShadow * windowWidth;
+  const shadowOffsetY = -offsetY * config.parallaxFactor.logoShadow * windowHeight;
+  logoShadow.style.transform = `translate(${shadowOffsetX}px, ${shadowOffsetY}px)`;
+}
+
+// ===== Helper Functions =====
+
+// Get count of huge shapes currently active
+function countHugeShapes() {
+  return activeShapes.filter(shape => shape.data.size >= 200).length;
+}
+
+// Get random shape size
+function getShapeSize() {
+  // Skip generating huge shapes during normal createShape() calls
+  // This prevents double-spawning at start and lets us control huge shapes 
+  // entirely through the dedicated methods (createHugeShape and ensureMinHugeShapes)
+  
+  // Normal distribution for regular shapes
+  const r = Math.random();
+  if (r < 0.35) return SHAPE_SIZES.TINY;    // 35% chance
+  if (r < 0.75) return SHAPE_SIZES.SMALL;   // 40% chance
+  if (r < 0.90) return SHAPE_SIZES.MEDIUM;  // 15% chance
+  return SHAPE_SIZES.LARGE;                 // 10% chance
+}
+
+// Get shape type, avoiding recent types for the same size
+function getShapeType(size) {
+  let newType;
+  // Use a string key for huge shapes since they have variable sizes
+  const sizeKey = size >= 200 ? 'huge' : size;
+  const recentTypesForSize = recentShapeTypesBySize[sizeKey] || [];
+  
+  do {
+    newType = shapeTypes[Math.floor(Math.random() * shapeTypes.length)];
+  } while (recentTypesForSize.includes(newType));
+  
+  // Track recent types for this size
+  if (!recentShapeTypesBySize[sizeKey]) {
+    recentShapeTypesBySize[sizeKey] = [];
+  }
+  
+  recentShapeTypesBySize[sizeKey].push(newType);
+  if (recentShapeTypesBySize[sizeKey].length > 2) {
+    recentShapeTypesBySize[sizeKey].shift();
+  }
+  
+  return newType;
+}
+
+// Get color based on shape size
+function getShapeColor(size) {
+  if (size === SHAPE_SIZES.TINY) return config.shapeColors.tiny;
+  if (size === SHAPE_SIZES.SMALL) return config.shapeColors.small;
+  if (size === SHAPE_SIZES.MEDIUM) return config.shapeColors.medium;
+  if (size === SHAPE_SIZES.LARGE) return config.shapeColors.large;
+  return config.shapeColors.huge; // For HUGE size
+}
+
+// Get resistance factor based on shape size
+function getResistance(size) {
+  if (size === SHAPE_SIZES.TINY) return 3.2;
+  if (size === SHAPE_SIZES.SMALL) return 2.8;
+  if (size === SHAPE_SIZES.MEDIUM) return 2.4;
+  if (size >= 200) return 0.8; // Less resistance for huge shapes
+  return 3.0; // For LARGE size
+}
+
+// Get friction factor based on shape size
+function getFriction(size) {
+  if (size === SHAPE_SIZES.TINY) return 0.996;
+  if (size === SHAPE_SIZES.SMALL) return 0.995;
+  if (size === SHAPE_SIZES.MEDIUM) return 0.99;
+  if (size >= 200) return 0.997; // Higher friction for huge shapes
+  return 0.995; // For LARGE size
+}
+
+// Get rotation speed based on shape size
+function getRotationSpeed(size) {
+  if (size === SHAPE_SIZES.TINY) return 40;
+  if (size === SHAPE_SIZES.SMALL) return 35;
+  if (size === SHAPE_SIZES.MEDIUM) return 25;
+  if (size === SHAPE_SIZES.LARGE) return 15;
+  return 6; // Very slow rotation for huge shapes
+}
+
+// Get base duration based on shape size
+function getBaseDuration(size) {
+  if (size === SHAPE_SIZES.TINY) return 12;
+  if (size === SHAPE_SIZES.SMALL) return 15;
+  if (size === SHAPE_SIZES.MEDIUM) return 25;
+  if (size === SHAPE_SIZES.LARGE) return 30;
+  return 50; // Huge shapes move even slower
+}
+
+// Grid positioning system with adjustments for huge shapes
+function getAvailablePosition(size) {
+  // For huge shapes, use a different positioning strategy
+  if (size >= 200) {
+    // Place huge shapes more centered
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Calculate range to keep shape mostly on screen
+    const minX = -size/4;
+    const maxX = windowWidth - (size * 0.75);
+    
+    // Calculate random position within constraints
+    return {
+      x: Math.floor(Math.random() * (maxX - minX)) + minX,
+      y: -size - (Math.random() * 100) // Start above viewport
+    };
+  }
+  
+  // Regular grid system for normal shapes
+  const cellSize = 60;
+  const totalCells = Math.floor(window.innerWidth / cellSize);
+  const availableCells = [];
+  const now = Date.now();
+  
+  // Find empty cells
+  for (let i = 0; i < totalCells; i++) {
+    if (!occupiedCells[i] || occupiedCells[i] < now - 5000) {
+      availableCells.push(i);
+    }
+  }
+  
+  let cell;
+  if (availableCells.length === 0) {
+    cell = Math.floor(Math.random() * totalCells);
+  } else {
+    cell = availableCells[Math.floor(Math.random() * availableCells.length)];
+  }
+  
+  occupiedCells[cell] = Date.now();
+  
+  const cellOffset = Math.random() * 20 - 10; // Small random offset
+  const x = (cell * cellSize) + (cellSize/2) - (size/2) + cellOffset;
+  const y = -50 - (Math.random() * 100);
+  
+  return { x, y };
+}
+
+// Track occupied cells
+const occupiedCells = {};
+
+// ===== Shape Creation =====
+
+function createShape() {
+  try {
+    // Basic properties
+    const size = getShapeSize();
+    const type = getShapeType(size);
+    const color = getShapeColor(size);
+    const isHuge = size >= 200;
+    
+    // Position calculation
+    const position = getAvailablePosition(size);
+    const x = position.x;
+    const startY = position.y;
+    
+    // Animation parameters
+    // Base duration with random variation
+    const baseDuration = getBaseDuration(size);
+    const durationVariation = 1 + ((Math.random() * 0.3) - 0.15);
+    const duration = baseDuration * durationVariation;
+    
+    // Rotation with random variation
+    const rotationSpeed = getRotationSpeed(size);
+    const rotationVariation = 1 + ((Math.random() * 0.2) - 0.1);
+    const finalRotationSpeed = rotationSpeed * rotationVariation;
+    
+    // Calculate vertical movement
+    const distance = window.innerHeight + 150 + (isHuge ? size/2 : 0); // Ensure shapes go off-screen
+    const speed = distance / duration;
+    
+    // Create DOM element
+    const element = document.createElement('div');
+    element.className = `shape ${type}`;
+    
+    // Apply base styles
+    element.style.width = `${size}px`;
+    element.style.height = `${size}px`;
+    element.style.backgroundColor = color;
+    element.style.left = `${x}px`;
+    element.style.bottom = `${startY}px`;
+    element.style.animation = `floatUp ${duration}s linear forwards`;
+    
+    // Special handling for triangle - fix to display properly
+    if (type === 'triangle') {
+      element.style.backgroundColor = 'transparent';
+      element.style.width = '0'; 
+      element.style.height = '0';
+      
+      // Create a proper equilateral triangle
+      const sideLength = size;
+      const height = Math.sqrt(3) / 2 * sideLength;
+      
+      element.style.borderLeft = `${sideLength / 2}px solid transparent`;
+      element.style.borderRight = `${sideLength / 2}px solid transparent`;
+      element.style.borderBottom = `${height}px solid ${color}`;
+    }
+    
+    // Special handling for cross
+    if (type === 'cross') {
+      element.style.backgroundColor = 'transparent';
+      const thickness = size * 0.25; // Thinner cross for huge shapes
+      
+      const bar1 = document.createElement('div');
+      bar1.style.position = 'absolute';
+      bar1.style.top = '0';
+      bar1.style.left = '50%';
+      bar1.style.width = `${thickness}px`;
+      bar1.style.height = '100%';
+      bar1.style.backgroundColor = color;
+      bar1.style.transform = 'translateX(-50%)';
+      
+      const bar2 = document.createElement('div');
+      bar2.style.position = 'absolute';
+      bar2.style.top = '50%';
+      bar2.style.left = '0';
+      bar2.style.width = '100%';
+      bar2.style.height = `${thickness}px`;
+      bar2.style.backgroundColor = color;
+      bar2.style.transform = 'translateY(-50%)';
+      
+      element.appendChild(bar1);
+      element.appendChild(bar2);
+    }
+    
+    // Create and store shape data object
+    const shapeData = {
+      id: Date.now() + Math.random(),
+      size: size,
+      baseX: x,
+      baseY: startY,
+      speed: speed,
+      rotationSpeed: finalRotationSpeed,
+      startTime: Date.now(),
+      friction: getFriction(size),
+      resistance: getResistance(size),
+      isHuge: isHuge,
+      
+      // Movement tracking
+      offsetX: 0,
+      offsetY: 0,
+      velocityX: 0,
+      velocityY: 0
+    };
+    
+    // Store the shape data on the DOM element itself
+    element.dataset.shapeId = shapeData.id;
+    
+    // Add to container
+    container.appendChild(element);
+    
+    // Add to active shapes array
+    activeShapes.push({
+      element: element,
+      data: shapeData
+    });
+    
+    // Update huge shape count
+    if (isHuge) {
+      hugeShapeCount++;
+    }
+    
+    // Set flag for first shape created
+    if (!firstShapeCreated) {
+      firstShapeCreated = true;
+    }
+    
+    // Remove when animation completes
+    element.addEventListener('animationend', () => {
+      // Update huge shape counter when a huge shape is removed
+      if (shapeData.isHuge) {
+        hugeShapeCount--;
+      }
+      
+      // Find and remove from active shapes array
+      activeShapes = activeShapes.filter(shape => 
+        shape.data.id !== shapeData.id
+      );
+      element.remove();
+    });
+  } catch (error) {
+    console.error('Error creating shape:', error);
+  }
+}
+
+// ===== Shape Movement =====
+
+function updateShapes() {
+  try {
+    const now = Date.now();
+    
+    activeShapes.forEach(shape => {
+      // Get element and data
+      const element = shape.element;
+      const data = shape.data;
+      
+      if (!element || !data) return;
+      
+      // Calculate elapsed time
+      const elapsed = now - data.startTime;
+      
+      // Calculate current vertical position
+      const progressY = elapsed * data.speed / 1000;
+      const currentY = data.baseY + progressY;
+      
+      // Calculate rotation
+      const rotation = (elapsed / 1000) * data.rotationSpeed;
+      
+      // Calculate current horizontal position
+      const currentX = data.baseX + data.offsetX;
+      
+      // Calculate center point of shape
+      const centerX = currentX + (data.size / 2);
+      const centerY = window.innerHeight - currentY - (data.size / 2);
+      
+      // Check cursor interaction
+      if (mouseX !== -1000 && mouseY !== -1000) {
+        // Skip cursor interaction for HUGE shapes
+        if (!data.isHuge) {
+          const dx = mouseX - centerX;
+          const dy = mouseY - centerY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Use different push radius for large shapes
+          const effectiveRadius = data.size === SHAPE_SIZES.LARGE ? 
+              config.pushRadius * 1.5 : config.pushRadius;
+          
+          if (distance < effectiveRadius) {
+            // Get normalized direction vector (avoid division by zero)
+            const dirX = distance > 0 ? dx / distance : 0;
+            const dirY = distance > 0 ? dy / distance : 0;
+            
+            // Calculate push force - reduce for large shapes
+            let pushForceMultiplier = config.pushStrength;
+            if (data.size === SHAPE_SIZES.LARGE) {
+              pushForceMultiplier = config.pushStrength * 0.44; // 56% less affected
+            }
+            
+            const pushX = -dirX * pushForceMultiplier * data.resistance;
+            const pushY = -dirY * pushForceMultiplier * data.resistance;
+            
+            // Add to velocity
+            data.velocityX += pushX;
+            data.velocityY += pushY;
+            
+            // Cap maximum velocity - lower for large shapes
+            const maxVelocity = data.size === SHAPE_SIZES.LARGE ? 0.6 : 0.8;
+            const currentVelocity = Math.sqrt(data.velocityX * data.velocityX + data.velocityY * data.velocityY);
+            
+            if (currentVelocity > maxVelocity) {
+              const factor = maxVelocity / currentVelocity;
+              data.velocityX *= factor;
+              data.velocityY *= factor;
+            }
+          }
+        }
+      }
+      
+      // Apply momentum with friction
+      if (data.velocityX !== 0 || data.velocityY !== 0) {
+        // Apply velocity to position
+        data.offsetX += data.velocityX;
+        data.offsetY += data.velocityY;
+        
+        // Apply friction from precomputed value
+        data.velocityX *= data.friction;
+        data.velocityY *= data.friction;
+        
+        // Stop very small movements
+        if (Math.abs(data.velocityX) < 0.01) data.velocityX = 0;
+        if (Math.abs(data.velocityY) < 0.01) data.velocityY = 0;
+      }
+      
+      // Apply transforms - ensure all shapes are using transform for movement
+      element.style.transform = `translate(${data.offsetX}px, ${data.offsetY}px) rotate(${rotation}deg)`;
+      element.style.bottom = `${currentY}px`;
+    });
+  } catch (error) {
+    console.error('Error updating shapes:', error);
+  }
+}
+
+// Function to ensure minimum huge shapes are present
+function ensureMinHugeShapes() {
+  const currentHugeCount = countHugeShapes();
+  
+  // If we need more huge shapes and we're under the maximum
+  if (currentHugeCount < config.minHugeShapes && hugeShapeCount < config.maxHugeShapes) {
+    createHugeShape();
+  }
+}
+
+// Function specifically to create a huge shape
+function createHugeShape() {
+  // Force size to be huge
+  const size = SHAPE_SIZES.HUGE();
+  const type = getShapeType(size);
+  const color = getShapeColor(size);
+  
+  // Position calculation
+  const position = getAvailablePosition(size);
+  const x = position.x;
+  const startY = position.y;
+  
+  // Animation parameters
+  const baseDuration = getBaseDuration(size);
+  const durationVariation = 1 + ((Math.random() * 0.3) - 0.15);
+  const duration = baseDuration * durationVariation;
+  
+  const rotationSpeed = getRotationSpeed(size);
+  const rotationVariation = 1 + ((Math.random() * 0.2) - 0.1);
+  const finalRotationSpeed = rotationSpeed * rotationVariation;
+  
+  // Calculate vertical movement
+  const distance = window.innerHeight + 150 + size/2;
+  const speed = distance / duration;
+  
+  // Create DOM element
+  const element = document.createElement('div');
+  element.className = `shape ${type}`;
+  
+  // Apply base styles
+  element.style.width = `${size}px`;
+  element.style.height = `${size}px`;
+  element.style.backgroundColor = color;
+  element.style.left = `${x}px`;
+  element.style.bottom = `${startY}px`;
+  element.style.animation = `floatUp ${duration}s linear forwards`;
+  
+  // Special handling for shape types (same as in createShape)
+  if (type === 'triangle') {
+    element.style.backgroundColor = 'transparent';
+    element.style.width = '0'; 
+    element.style.height = '0';
+    
+    const sideLength = size;
+    const height = Math.sqrt(3) / 2 * sideLength;
+    
+    element.style.borderLeft = `${sideLength / 2}px solid transparent`;
+    element.style.borderRight = `${sideLength / 2}px solid transparent`;
+    element.style.borderBottom = `${height}px solid ${color}`;
+  }
+  
+  if (type === 'cross') {
+    element.style.backgroundColor = 'transparent';
+    const thickness = size * 0.25;
+    
+    const bar1 = document.createElement('div');
+    bar1.style.position = 'absolute';
+    bar1.style.top = '0';
+    bar1.style.left = '50%';
+    bar1.style.width = `${thickness}px`;
+    bar1.style.height = '100%';
+    bar1.style.backgroundColor = color;
+    bar1.style.transform = 'translateX(-50%)';
+    
+    const bar2 = document.createElement('div');
+    bar2.style.position = 'absolute';
+    bar2.style.top = '50%';
+    bar2.style.left = '0';
+    bar2.style.width = '100%';
+    bar2.style.height = `${thickness}px`;
+    bar2.style.backgroundColor = color;
+    bar2.style.transform = 'translateY(-50%)';
+    
+    element.appendChild(bar1);
+    element.appendChild(bar2);
+  }
+  
+  // Create and store shape data object
+  const shapeData = {
+    id: Date.now() + Math.random(),
+    size: size,
+    baseX: x,
+    baseY: startY,
+    speed: speed,
+    rotationSpeed: finalRotationSpeed,
+    startTime: Date.now(),
+    friction: getFriction(size),
+    resistance: getResistance(size),
+    isHuge: true,
+    
+    // Movement tracking
+    offsetX: 0,
+    offsetY: 0,
+    velocityX: 0,
+    velocityY: 0
+  };
+  
+  // Store the shape data on the DOM element itself
+  element.dataset.shapeId = shapeData.id;
+  
+  // Add to container
+  container.appendChild(element);
+  
+  // Add to active shapes array
+  activeShapes.push({
+    element: element,
+    data: shapeData
+  });
+  
+  // Update huge shape count
+  hugeShapeCount++;
+  
+  // Remove when animation completes
+  element.addEventListener('animationend', () => {
+    hugeShapeCount--;
+    
+    // Find and remove from active shapes array
+    activeShapes = activeShapes.filter(shape => 
+      shape.data.id !== shapeData.id
+    );
+    element.remove();
+    
+    // Ensure minimum huge shapes after removal
+    setTimeout(ensureMinHugeShapes, 100);
+  });
+}
+
+// ===== Load SVG =====
+async function loadSVGPaths(filename) {
+  try {
+    const resp = await fetch(filename);
+    const parser = new DOMParser();
+    const svg = parser.parseFromString(await resp.text(), 'image/svg+xml');
+    
+    // Get both paths by their IDs
+    const logoData = svg.querySelector('#logo');
+    const shadowData = svg.querySelector('#shadow');
+    
+    // Get the path data
+    const logoPath = logoData ? logoData.getAttribute('d') : null;
+    const shadowPath = shadowData ? shadowData.getAttribute('d') : null;
+    // Get viewBox data
+    const svgData = svg.querySelector('svg');
+    const logoViewBox = svgData ? svgData.getAttribute('viewBox') : null;
+
+    // Place them in their containers
+    if (logoData) {
+      document.querySelector('.logo-main').innerHTML = `
+        <svg viewBox="${logoViewBox}" xmlns="http://www.w3.org/2000/svg">
+          <path d="${logoPath}" fill="currentColor"/>
+        </svg>
+      `;
+    }
+    
+    if (shadowData) {
+      document.querySelector('.logo-shadow').innerHTML = `
+        <svg viewBox="${logoViewBox}" xmlns="http://www.w3.org/2000/svg">
+          <path d="${shadowPath}" fill="currentColor"/>
+        </svg>
+      `;
+    }
+  } catch (error) {
+    console.error('Error loading SVG:', error);
+  }
+}
+
+
+// ===== Event Handlers =====
+
+
+document.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  
+  // Update cursor position
+  cursor.style.left = `${mouseX}px`;
+  cursor.style.top = `${mouseY}px`;
+  cursor.style.display = showCursor ? 'block' : 'none';
+  
+  // Hide default cursor when indicator is visible
+  document.body.style.cursor = showCursor ? 'none' : 'auto';
+  
+  // Update parallax effect
+  updateLogoParallax();
+});
+
+document.addEventListener('mouseout', e => {
+  if (!e.relatedTarget) {
+    mouseX = -1000;
+    mouseY = -1000;
+    cursor.style.display = 'none';
+    document.body.style.cursor = 'auto';
+  }
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'v') {
+    toggleCursor();
+  }
+});
+
+window.addEventListener('load', async function() {
+  await loadSVGPaths('./logo/logo_snorklefudge.svg');  
+});
+
+// Toggle cursor function
+function toggleCursor() {
+  showCursor = !showCursor;
+  cursor.style.display = showCursor ? 'block' : 'none';
+  document.body.style.cursor = showCursor ? 'none' : 'auto';
+}
+
+// Toggle text click handler
+const toggleText = document.getElementById('toggle-text');
+toggleText.addEventListener('click', toggleCursor);
+
+window.addEventListener('resize', () => {
+  Object.keys(occupiedCells).forEach(key => delete occupiedCells[key]);
+});
+
+// ===== Animation Loop =====
+
+function animationLoop(timestamp) {
+  try {
+    // Create new shapes at interval
+    if (timestamp - lastShapeTime >= config.shapeInterval) {
+      // Only ensure minimum shapes when we're not during initial startup
+      // This prevents double spawning at start
+      if (firstShapeCreated) {
+        // Ensure we always have the minimum number of huge shapes
+        if (countHugeShapes() < config.minHugeShapes) {
+          ensureMinHugeShapes();
+        }
+      }
+      
+      createShape();
+      lastShapeTime = timestamp;
+    }
+    
+    // Update all shapes
+    updateShapes();
+    
+    // Continue loop
+    requestAnimationFrame(animationLoop);
+  } catch (error) {
+    console.error('Error in animation loop:', error);
+    // Try to recover by continuing the loop
+    requestAnimationFrame(animationLoop);
+  }
+}
+
+// Start with a huge shape immediately (and ONLY one)
+createHugeShape();
+hugeShapeCount = 1; // Make sure counter is accurate
+
+// Initialize parallax effect (even before mousemove)
+updateLogoParallax();
+
+// Start animation loop
+requestAnimationFrame(animationLoop);
+
+</script>
+
+</body>
+</html>
