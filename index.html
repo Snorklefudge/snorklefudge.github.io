@@ -44,6 +44,7 @@
       z-index: 100;
       transform: translate(-50%, -50%);
       display: block;
+      opacity: 1;
     }
 
     .toggle-text {
@@ -151,7 +152,7 @@
       opacity: 0;
       transform: scale(1);
       transform-origin: top center;
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.2s ease;
       pointer-events: none;
     }
 
@@ -180,6 +181,11 @@
       pointer-events: auto;
     }
 
+    .socials-container:hover + .message-button {
+      transform: translateY(60px);
+      transition: transform 0.2s ease;
+    }
+
     .social-link a {
       color: whitesmoke;
       text-decoration: none;
@@ -191,15 +197,14 @@
     }
 
     .message-button {
-      border: none;
+      border: 4px solid rgb(153, 153, 139);
       background: none;
 
-      background-color: rgb(153, 153, 139);
-      padding: 10px 30px;
+      padding: 10px 26px;
       border-radius: 26px;
-      cursor: auto !important;
+      cursor: pointer !important;
       
-      color: whitesmoke;
+      color: rgb(153, 153, 139);
       text-align: center;
       text-decoration: none;
       font-size: 18px;
@@ -208,11 +213,21 @@
       font-style: normal;
       letter-spacing: 2px;
 
-      transition: transform 0.3s ease, opacity 0.3s ease;
+      transition: transform 1s ease;
     }
     
     .message-button:hover {
       transform: scale(1.1);
+      transition: transform 0.3s ease;
+      text-decoration: underline;
+    }
+    
+    .message-button:hover + .socials-container {
+      transform: translateY(20px);
+    
+    }
+    .message-button:hover .cursor-indicator {
+      opacity: 0;
     }
 
 
@@ -262,10 +277,8 @@
     </div>
 
   </div>
-  <div class="message-button" id="message-button">
-    <button class="message-button">Message Me!</button>
-    
-  </div>
+  <button class="message-button">Message Me!</button>
+  
 </div>
 
 <script>
