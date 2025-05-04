@@ -101,12 +101,12 @@
       color: whitesmoke;
     }
     
-    .socials-container{
+    .buttons {
       position: fixed;
       top: 48%;
       left: 50%;
       transform: translate(-50%, -50%);
-      z-index: 99;
+      z-index: 100;
       
       will-change: transform;
       transition: transform 0.15s ease-out;
@@ -114,13 +114,17 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 10px;
+      gap: 20px;
+    }
+    
+    .socials-container{
+      cursor: auto !important;
     }
     
     .socials-button {
       background-color: rgb(153, 153, 139);
       padding: 10px 30px;
-      border-radius: 24px;
+      border-radius: 26px;
       color: whitesmoke;
       text-align: center;
       font-size: 18px;
@@ -128,17 +132,27 @@
       font-weight: 600;
       font-style: normal;
       letter-spacing: 2px;
+
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
 
     .socials-links {
+      position: absolute;
       background-color: rgb(153, 153, 139);
-      border-radius: 24px;
-      padding: 16px 20px;
-      border: 2px solid red;
-
+      border-radius: 26px;
+      padding: 18px 30px;
+      top: 0;
+      z-index: 101;
+      
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      opacity: 0;
+      transform: scale(1);
+      transform-origin: top center;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
     }
 
     .social-link{
@@ -147,10 +161,23 @@
       font-size: 16px;
       font-weight: 400;
       letter-spacing: 2px;
+      text-align: center;
 
       display: flex;
       align-items: center;
       gap: 16px;
+    }
+
+    .socials-container:hover .socials-button {
+      opacity: 0;
+      transform: scale(1.1);
+      pointer-events: none;
+    }
+
+    .socials-container:hover .socials-links {
+      opacity: 1;
+      transform: scale(1.1);
+      pointer-events: auto;
     }
 
     .social-link a {
@@ -162,6 +189,32 @@
       text-decoration: underline;
       cursor: pointer;
     }
+
+    .message-button {
+      border: none;
+      background: none;
+
+      background-color: rgb(153, 153, 139);
+      padding: 10px 30px;
+      border-radius: 26px;
+      cursor: auto !important;
+      
+      color: whitesmoke;
+      text-align: center;
+      text-decoration: none;
+      font-size: 18px;
+      font-family: "Readex Pro", sans-serif;
+      font-weight: 600;
+      font-style: normal;
+      letter-spacing: 2px;
+
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .message-button:hover {
+      transform: scale(1.1);
+    }
+
 
     @keyframes floatUp {
       0% { opacity: 0; }
@@ -190,21 +243,28 @@
   <div class="logo-shadow" id="logo-shadow"></div>
 </div>
 
-<div class="socials-container" id="socials-container">
-  <div class="socials-button" id="socials-button">Social Links</div>
-  <div class="socials-links" id="social-links">
-    <div class="social-link" id="social-link">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
-      </svg>
-      <a href="https://www.linkedin.com/in/konradjedruszek/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+<div class="buttons" id="buttons">
+  <div class="socials-container" id="socials-container">
+    <div class="socials-button" id="socials-button">Social Links</div>
+    <div class="socials-links" id="social-links">
+      <div class="social-link" id="social-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854zm4.943 12.248V6.169H2.542v7.225zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248S2.4 3.226 2.4 3.934c0 .694.521 1.248 1.327 1.248zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016l.016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225z"/>
+        </svg>
+        <a href="https://www.linkedin.com/in/konradjedruszek" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      </div>
+      <div class="social-link" id="social-link">
+        <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
+          <path d="M2 377.4l43 74.3A51.35 51.35 0 0 0 90.9 480h285.4l-59.2-102.6zM501.8 350L335.6 59.3A51.38 51.38 0 0 0 290.2 32h-88.4l257.3 447.6 40.7-70.5c1.9-3.2 21-29.7 2-59.1zM275 304.5l-115.5-200L44 304.5z"/>
+        </svg>
+        <a href="https://www.artstation.com/konradjdruszek" target="_blank" rel="noopener noreferrer">Artstation</a>
+      </div>
     </div>
-    <div class="social-link" id="social-link">
-      <svg width="22" height="22" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="currentColor">
-        <path d="M2 377.4l43 74.3A51.35 51.35 0 0 0 90.9 480h285.4l-59.2-102.6zM501.8 350L335.6 59.3A51.38 51.38 0 0 0 290.2 32h-88.4l257.3 447.6 40.7-70.5c1.9-3.2 21-29.7 2-59.1zM275 304.5l-115.5-200L44 304.5z"/>
-      </svg>
-      <a href="https://www.artstation.com/konradjdruszek" target="_blank" rel="noopener noreferrer">Artstation</a>
-    </div>
+
+  </div>
+  <div class="message-button" id="message-button">
+    <button class="message-button">Message Me!</button>
+    
   </div>
 </div>
 
@@ -245,7 +305,7 @@ const cursor = document.getElementById('cursor-indicator');
 const logoMain = document.getElementById('logo-main');
 const logoShadow = document.getElementById('logo-shadow');
 const logoContainer = document.getElementById('logo-container');
-const socialsContainer = document.getElementById('socials-container');
+const buttonsContainer = document.getElementById('buttons');
 
 // Tracking variables
 let activeShapes = [];
@@ -287,7 +347,7 @@ function updateLogoParallax() {
   // Apply to socials
   const socialsOffsetX = -offsetX * config.parallaxFactor.socialsContainer * windowWidth;
   const socialsOffsetY = -offsetY * config.parallaxFactor.socialsContainer * windowHeight;
-  socialsContainer.style.transform = `translate(calc(-50% + ${socialsOffsetX}px), calc(-50% + ${socialsOffsetY}px))`;
+  buttonsContainer.style.transform = `translate(calc(-50% + ${socialsOffsetX}px), calc(-50% + ${socialsOffsetY}px))`;
 
 }
 
@@ -882,15 +942,6 @@ document.addEventListener('keydown', e => {
   }
 });
 
-socialsContainer.addEventListener('mouseenter', () => {
-  // Cursor entered socials container
-  console.log('Entered socials!');
-});
-
-socialsContainer.addEventListener('mouseleave', () => {
-  // Cursor left socials container  
-  console.log('Left socials!');
-});
 
 window.addEventListener('load', async function() {
   await loadSVGPaths('./logo/logo_snorklefudge.svg');  
