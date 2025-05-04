@@ -101,29 +101,23 @@
       color: whitesmoke;
     }
     
-    .socials-containter{
+    .socials-container{
       position: fixed;
       top: 50%;
       left: 50%;
-      height: 30px;
-      width: 200px;
       transform: translate(-50%, -50%);
     }
     
     .socials-button {
-      position: absolute;
-      transform: translate(0, 0);
-      top: 0;
-      left: 0;
       will-change: transform;
       transition: transform 0.15s ease-out;
       z-index: 99;
       border-radius: 24px;
-      background-color: #868679ff;
-      padding: 16px 24px;
+      background-color: rgb(153, 153, 139);
+      padding: 10px 30px;
       color: whitesmoke;
       text-align: center;
-      font-size: 24px;
+      font-size: 18px;
       font-family: "Readex Pro", system-ui;
       font-weight: 500;
       font-style: normal;
@@ -162,7 +156,7 @@
 
 </div>
 
-<div class="socials-containter" id="socials-containter">
+<div class="socials-container" id="socials-container">
   <div class="socials-button" id="socials-button">
     Social Links
     <div class="socials-links"></div>
@@ -187,7 +181,7 @@ const config = {
   parallaxFactor: {
     logoMain: 0.013,        // Main logo parallax strength (higher = more movement)
     logoShadow: 0.01,       // Shadow parallax strength (lower = less movement)
-    socialsButton: 0.01
+    socialsButton: 0.008
   }
 };
 
