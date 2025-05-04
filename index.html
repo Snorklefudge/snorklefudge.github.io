@@ -103,14 +103,15 @@
     
     .socials-container{
       position: fixed;
+      border: 2px solid red;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      will-change: transform;
+      transition: transform 0.15s ease-out;
     }
     
     .socials-button {
-      will-change: transform;
-      transition: transform 0.15s ease-out;
       z-index: 99;
       border-radius: 24px;
       background-color: rgb(153, 153, 139);
@@ -122,7 +123,12 @@
       font-weight: 500;
       font-style: normal;
       letter-spacing: 1px;
+    }
 
+    .social-links {
+      background-color: rgb(153, 153, 139);
+      width: 200px;
+      height: 50px;
     }
 
     @keyframes floatUp {
@@ -157,10 +163,8 @@
 </div>
 
 <div class="socials-container" id="socials-container">
-  <div class="socials-button" id="socials-button">
-    Social Links
-    <div class="socials-links"></div>
-  </div>
+  <div class="socials-button" id="socials-button">Social Links</div>
+  <div class="socials-links" id="social-links"></div>
 </div>
 
 <script>
@@ -200,7 +204,7 @@ const cursor = document.getElementById('cursor-indicator');
 const logoMain = document.getElementById('logo-main');
 const logoShadow = document.getElementById('logo-shadow');
 const logoContainer = document.getElementById('logo-container');
-const socialsButton = document.getElementById('socials-button');
+const socialsButton = document.getElementById('socials-container');
 
 // Tracking variables
 let activeShapes = [];
@@ -239,7 +243,7 @@ function updateLogoParallax() {
   const shadowOffsetX = -offsetX * config.parallaxFactor.logoShadow * windowWidth;
   const shadowOffsetY = -offsetY * config.parallaxFactor.logoShadow * windowHeight;
   logoShadow.style.transform = `translate(${shadowOffsetX}px, ${shadowOffsetY}px)`;
-  // 
+  // Apply to socials
   const socialsOffsetX = -offsetX * config.parallaxFactor.socialsButton * windowWidth;
   const socialsOffsetY = -offsetY * config.parallaxFactor.socialsButton * windowHeight;
   socialsButton.style.transform = `translate(${socialsOffsetX}px, ${socialsOffsetY}px)`;
