@@ -100,6 +100,36 @@
       transition: transform 0.15s ease-out;
       color: whitesmoke;
     }
+    
+    .socials-containter{
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      height: 30px;
+      width: 200px;
+      transform: translate(-50%, -50%);
+    }
+    
+    .socials-button {
+      position: absolute;
+      transform: translate(0, 0);
+      top: 0;
+      left: 0;
+      will-change: transform;
+      transition: transform 0.15s ease-out;
+      z-index: 99;
+      border-radius: 24px;
+      background-color: #868679ff;
+      padding: 16px 24px;
+      color: whitesmoke;
+      text-align: center;
+      font-size: 24px;
+      font-family: "Readex Pro", system-ui;
+      font-weight: 500;
+      font-style: normal;
+      letter-spacing: 1px;
+
+    }
 
     @keyframes floatUp {
       0% { opacity: 0; }
@@ -108,8 +138,10 @@
       100% { opacity: 0; }
     }
   </style>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap">
-  <link rel="icon" href="./logo/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap" rel="stylesheet">
+<link rel="icon" href="./logo/favicon.svg" type="image/svg+xml">
   
 </head>
 <body>
@@ -130,6 +162,13 @@
 
 </div>
 
+<div class="socials-containter" id="socials-containter">
+  <div class="socials-button" id="socials-button">
+    Social Links
+    <div class="socials-links"></div>
+  </div>
+</div>
+
 <script>
 // Configuration
 const config = {
@@ -147,7 +186,8 @@ const config = {
   minHugeShapes: 1,        // Minimum number of huge shapes on screen
   parallaxFactor: {
     logoMain: 0.013,        // Main logo parallax strength (higher = more movement)
-    logoShadow: 0.01       // Shadow parallax strength (lower = less movement)
+    logoShadow: 0.01,       // Shadow parallax strength (lower = less movement)
+    socialsButton: 0.01
   }
 };
 
@@ -166,6 +206,7 @@ const cursor = document.getElementById('cursor-indicator');
 const logoMain = document.getElementById('logo-main');
 const logoShadow = document.getElementById('logo-shadow');
 const logoContainer = document.getElementById('logo-container');
+const socialsButton = document.getElementById('socials-button');
 
 // Tracking variables
 let activeShapes = [];
@@ -204,6 +245,10 @@ function updateLogoParallax() {
   const shadowOffsetX = -offsetX * config.parallaxFactor.logoShadow * windowWidth;
   const shadowOffsetY = -offsetY * config.parallaxFactor.logoShadow * windowHeight;
   logoShadow.style.transform = `translate(${shadowOffsetX}px, ${shadowOffsetY}px)`;
+  // 
+  const socialsOffsetX = -offsetX * config.parallaxFactor.socialsButton * windowWidth;
+  const socialsOffsetY = -offsetY * config.parallaxFactor.socialsButton * windowHeight;
+  socialsButton.style.transform = `translate(${socialsOffsetX}px, ${socialsOffsetY}px)`;
 }
 
 // ===== Helper Functions =====
