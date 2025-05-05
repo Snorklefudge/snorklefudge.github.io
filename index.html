@@ -45,6 +45,8 @@
       transform: translate(-50%, -50%);
       display: block;
       opacity: 1;
+
+      transition: opacity 0.2s ease;
     }
 
     .toggle-text {
@@ -65,7 +67,7 @@
     /* Logo container styles */
     .logo-container {
       position: fixed;
-      top: 26%;
+      top: 36%;
       left: 50%;
       width: 500px;
       height: 500px;
@@ -87,6 +89,7 @@
       transition: transform 0.15s ease-out;
       color: #868679ff;
       opacity: 1;
+      
     }
 
     .logo-main { 
@@ -104,7 +107,7 @@
     
     .buttons {
       position: fixed;
-      top: 48%;
+      top: 60%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 100;
@@ -120,12 +123,15 @@
     
     .socials-container{
       cursor: auto !important;
+      transition: transform 0.3s ease;
     }
     
     .socials-button {
       background-color: rgb(153, 153, 139);
       padding: 10px 30px;
       border-radius: 26px;
+      z-index: 110;
+
       color: whitesmoke;
       text-align: center;
       font-size: 18px;
@@ -143,11 +149,11 @@
       border-radius: 26px;
       padding: 18px 30px;
       top: 0;
-      z-index: 101;
+      z-index: 111;
       
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 18px;
 
       opacity: 0;
       transform: scale(1);
@@ -163,11 +169,13 @@
       font-weight: 400;
       letter-spacing: 2px;
       text-align: center;
+      z-index: 112 ;
 
       display: flex;
       align-items: center;
       gap: 16px;
     }
+
 
     .socials-container:hover .socials-button {
       opacity: 0;
@@ -179,11 +187,6 @@
       opacity: 1;
       transform: scale(1.1);
       pointer-events: auto;
-    }
-
-    .socials-container:hover + .message-button {
-      transform: translateY(60px);
-      transition: transform 0.2s ease;
     }
 
     .social-link a {
@@ -203,6 +206,7 @@
       padding: 10px 26px;
       border-radius: 26px;
       cursor: pointer !important;
+      z-index: 101;
       
       color: rgb(153, 153, 139);
       text-align: center;
@@ -213,21 +217,15 @@
       font-style: normal;
       letter-spacing: 2px;
 
-      transition: transform 1s ease;
+      transition: transform 0.2s ease;
     }
     
     .message-button:hover {
-      transform: scale(1.1);
-      transition: transform 0.3s ease;
       text-decoration: underline;
     }
     
-    .message-button:hover + .socials-container {
-      transform: translateY(20px);
-    
-    }
-    .message-button:hover .cursor-indicator {
-      opacity: 0;
+    .message-button.raised {
+      transition: transform 0.8s ease;
     }
 
 
@@ -319,6 +317,8 @@ const logoMain = document.getElementById('logo-main');
 const logoShadow = document.getElementById('logo-shadow');
 const logoContainer = document.getElementById('logo-container');
 const buttonsContainer = document.getElementById('buttons');
+const socialsContainer = document.querySelector('.socials-container');
+const messageButton = document.querySelector('.message-button');
 
 // Tracking variables
 let activeShapes = [];
@@ -955,6 +955,30 @@ document.addEventListener('keydown', e => {
   }
 });
 
+messageButton.addEventListener('mouseenter', () => {
+  cursor.style.opacity = '0';
+  socialsContainer.style.transform = 'translateY(-6px)';
+  messageButton.classList.remove('raised');
+  messageButton.style.transform = 'scale(1.1)';
+});
+
+messageButton.addEventListener('mouseleave', () => {
+  cursor.style.opacity = '1';
+  socialsContainer.style.transform = 'translateY(0)';
+  messageButton.style.transform = 'scale(1)'
+});
+
+socialsContainer.addEventListener('mouseenter', () => {
+  cursor.style.opacity = '0';
+  messageButton.classList.remove('raised');
+  messageButton.style.transform = 'translateY(68px)';
+});
+
+socialsContainer.addEventListener('mouseleave', () => {
+  cursor.style.opacity = '1';
+  messageButton.classList.add('raised');
+  messageButton.style.transform = 'translateY(0)';
+});
 
 window.addEventListener('load', async function() {
   await loadSVGPaths('./logo/logo_snorklefudge.svg');  
