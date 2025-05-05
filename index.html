@@ -289,6 +289,7 @@
       background: none;
       border: none;
       margin-left: auto;
+      z-index: 201;
       
       color: #868679ff;
       font-size: 40px;
@@ -296,6 +297,7 @@
       text-align: center;
       padding: 0;
       line-height: 20px;
+      cursor: pointer;
     }
 
     @keyframes floatUp {
@@ -349,7 +351,7 @@
 
 <div class="form-container" id="form-container">
   <form action="https://formsubmit.co/snoflake9@gmail.com" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
-    <button class="close-button">&times;</button>
+    <button type="button" class="close-button" id="close-button">&times;</button>
     <div class="form">
       <div style="display: flex; flex-direction: row; gap: 20px;" >
         <input type="text" name="name" placeholder="Name" class="form-input" required> 
@@ -1079,8 +1081,19 @@ formContainer.addEventListener('mouseleave', () => {
   cursor.style.opacity = '1';
 });
 
-closeButton.addEventListener('click', () => {
-  formContainer.classList.remove('open');
+document.addEventListener('DOMContentLoaded', function() {
+  
+  const closeForm = () => {
+    formContainer.classList.remove('open');
+  }
+  if (closeButton && formContainer) {
+    closeButton.addEventListener('click', closeForm);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        closeForm();
+      }
+    });
+  }
 });
 
 window.addEventListener('load', async function() {
