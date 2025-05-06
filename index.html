@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="english">
 <head>
   <meta charset="UTF-8">
   <title>Snorklefudge</title>
@@ -11,22 +11,34 @@
       overflow: hidden;
       background-color: #FAF9F6;
       font-family: 'DM Mono', monospace;
+
+    }
+    
+    :focus {  
+      outline: 5px solid #32b43299;
+      border-radius: 24px;
+    }
+    
+    a:focus {
+      outline: none;
+      text-decoration: underline 3px;   
     }
 
+    
     .shape-container {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
+      width: 100%;  
       height: 100%;
       pointer-events: none;
     }
 
     .shape {
-      position: absolute;
+      position: absolute; 
       opacity: 0;
       will-change: transform, opacity;
-      transform-origin: center;
+      transform-origin: center;   
     }
 
     .circle {
@@ -34,11 +46,11 @@
     }
 
     .cursor-indicator {
-      position: absolute;
+      position: absolute; 
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      border: 5px solid rgba(50, 180, 50, 0.6);
+      border: 5px solid #32b43299;
       background-color: transparent;
       pointer-events: none;
       z-index: 100;
@@ -107,7 +119,7 @@
     
     .buttons {
       position: fixed;
-      top: 60%;
+      top: 56%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 100;
@@ -147,7 +159,7 @@
       position: absolute;
       background-color: #99998b;
       border-radius: 26px;
-      padding: 18px 30px;
+      padding: 26px 30px;
       top: 0;
       z-index: 111;
       
@@ -173,9 +185,9 @@
 
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 20px;
     }
-
+  
 
     .socials-container:hover .socials-button {
       opacity: 0;
@@ -195,11 +207,11 @@
     }
 
     .social-link a:hover {
-      text-decoration: underline;
+      text-decoration: underline 3px;
       cursor: pointer;
     }
-
-    .message-button {
+    
+    .message-button { 
       border: 4px solid #99998b;
       background: none;
 
@@ -221,7 +233,7 @@
     }
     
     .message-button:hover {
-      text-decoration: underline;
+      text-decoration: underline 3px;
     }
     
     .message-button.raised {
@@ -230,17 +242,20 @@
 
     .form-container {
       position: fixed;
-      top: 68%;
+      top: 65%;
       left: 50%;
-      transform: translate(-50%,-50%);
+      transform: translateX(-50%);
+      
       padding: 30px 40px;
       z-index: 200;
+
       
       background-color: #eff0e985;
       border-radius: 40px;
       cursor: auto !important;
 
       will-change: transform;
+      transition: opacity 0.2s, top 0.3s;
       opacity: 0;
       pointer-events: none;
     }
@@ -248,9 +263,25 @@
     .form-container.open {
       opacity: 1;
       pointer-events: auto;
+      top: 38%;
     }
 
-    .form{
+    .form {
+      display: flex; 
+      flex-direction: column; 
+      gap: 28px; 
+    }
+
+    .form-top {
+      display: flex;
+      flex-direction: row;
+    }
+    
+    .form-top:focus {
+      border: none;
+    }
+
+    .form-input {
       background-color: #868679ff;
       padding: 34px 34px;
       border-radius: 26px;
@@ -259,30 +290,42 @@
       flex-direction: column;
       align-items: center;
       gap: 24px;
+  
     }
 
-    .form-input {
+    .form-text {
       border: none;
       border-radius: 24px;
-      padding: 10px 10px;
-      text-indent: 10px;
+      padding: 10px 16px;
       font-family: "Readex Pro", sans-serif;
-      font-weight: 16px;
-      font-weight: 300;
+      font-size: 16px;
+      font-weight: 600;
     }
 
+    .form-text::placeholder {
+      font-weight: 300;
+    }
+    
     .send-button {
       border: 4px solid  #99998b;
       border-radius: 24px;
       background: none;
       padding: 10px 10px;
-      margin: auto;
       width: 120px;
+      margin: auto;
+      cursor: pointer;
 
       color: #99998b;
       font-family: "Readex Pro", sans-serif;
       font-size: 18px;
       font-weight: 700;
+
+      transition: transform 0.2s ease;
+    }
+
+    .send-button:hover {
+      text-decoration: underline 3px;
+      transform: scale(1.1)
     }
 
     .close-button {
@@ -293,11 +336,55 @@
       
       color: #868679ff;
       font-size: 40px;
-      font-weight: bold ;
+      font-weight: 800;
       text-align: center;
       padding: 0;
       line-height: 20px;
       cursor: pointer;
+
+      transform: scale(0.9);
+      transition: 
+      transform 0.2s ease, color 0.2s;
+    }
+
+    .close-button:focus {  
+      outline-offset: 6px;
+    }
+
+    .close-button:hover {
+      transform: scale(1.2);
+      color: #9c9c90;
+    }
+
+    .h-captcha {
+      border: 4px solid blue;
+      visibility: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: scale(0.1);
+      overflow: hidden;
+      margin: auto;
+      
+      transition: all 0.3s ease;
+    }
+
+    .h-captcha.open {
+      visibility: visible;
+      max-height: 100px;
+      opacity: 1;
+      transform: scale(1);
+      transition: all 0.3s ease;
+    }
+    
+    .result {
+      text-align: center;
+      color: #99998b;
+      font-family: "Readex Pro", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 0px;
+      margin: 0;
+
     }
 
     @keyframes floatUp {
@@ -349,19 +436,29 @@
   <button class="message-button" id="message-button">Message Me!</button>
 </div>
 
+
+<!-- //* Contact Form -->
 <div class="form-container" id="form-container">
-  <form action="https://formsubmit.co/snoflake9@gmail.com" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
-    <button type="button" class="close-button" id="close-button">&times;</button>
-    <div class="form">
-      <div style="display: flex; flex-direction: row; gap: 20px;" >
-        <input type="text" name="name" placeholder="Name" class="form-input" required> 
-        <input type="email" name="email" placeholder="Email" class="form-input" required>
-      </div>
-      <textarea class="form-input" type="message" rows="10" style="width: 95%; padding: 20px 10px;" placeholder="Your message..." required></textarea>
-      <input type="text" name="_honey" style="display:none">
-    </div>
-    <button type="submit" class="send-button">Send</button>
+  <form method="POST" class="form" id="form">
+    <input type="hidden" name="access_key" value="64d7f524-4625-491a-bda9-fcecd641a2ce">
+    <input type="hidden" name="from_name" value="Snorklefudge Page">
     
+    <div class="form-top" id="form-top">
+      <button type="button" class="close-button" id="close-button">&times;</button>
+    </div>
+    
+    <div class="form-input">
+      <div style="display: flex; flex-direction: row; gap: 24px;" >
+        <input type="text" name="name" placeholder="Name" class="form-text" required> 
+        <input type="email" name="email" placeholder="Email" class="form-text" required>
+      </div>
+      <textarea class="form-text" type="message" name="message" rows="10" style="width: 95%; padding: 20px 20px; font-weight: 300;" placeholder="Your message..." required></textarea>
+    </div>
+    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+    
+    <button type="submit" class="send-button">Send</button>
+    <div class="result" id="result"></div>
+    <div class="h-captcha" id="h-captcha" data-captcha="true"></div>
   </form>
 
 </div>
@@ -407,6 +504,9 @@ const socialsContainer = document.getElementById('socials-container');
 const messageButton = document.getElementById('message-button');
 const formContainer = document.getElementById('form-container');
 const closeButton = document.getElementById('close-button');
+const sendButton = document.getElementById('send-button');
+const captcha = document.querySelector('.h-captcha');
+
 
 
 // Tracking variables
@@ -1009,6 +1109,24 @@ async function loadSVGPaths(filename) {
   }
 }
 
+function disableFocus() {
+  document.addEventListener('focusin', function(event) {
+    event.target.style.outline = 'none';
+  });
+}
+
+function enableFocus() {
+  document.addEventListener('focusin', function(event) {
+    event.target.style.outline = '';
+  });
+}
+
+// Closing contact me window
+function closeForm() {
+    formContainer.classList.remove('open');
+    messageButton.blur();
+}
+
 
 // ===== Event Handlers =====
 
@@ -1047,7 +1165,7 @@ document.addEventListener('keydown', e => {
 socialsContainer.addEventListener('mouseenter', () => {
   cursor.style.opacity = '0';
   messageButton.classList.remove('raised');
-  messageButton.style.transform = 'translateY(68px)';
+  messageButton.style.transform = 'translateY(86px)';
 });
 
 socialsContainer.addEventListener('mouseleave', () => {
@@ -1081,24 +1199,85 @@ formContainer.addEventListener('mouseleave', () => {
   cursor.style.opacity = '1';
 });
 
+
 document.addEventListener('DOMContentLoaded', function() {
-  
-  const closeForm = () => {
-    formContainer.classList.remove('open');
-  }
+
   if (closeButton && formContainer) {
     closeButton.addEventListener('click', closeForm);
+    
+    // Disable closeButton focus when hovering
+    closeButton.addEventListener('mouseenter', disableFocus);
+    closeButton.addEventListener('mouseleave', enableFocus);
+    
+    // Close on hitting escape
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') {
         closeForm();
       }
     });
+    
+    document.addEventListener('input', function() {
+      const inputs = formContainer.querySelectorAll('input[type="text"], input[type="email"], textarea');
+      const anyFilled = Array.from(inputs).some(input => input.value.trim().length > 0);
+      
+      if (anyFilled) {
+        captcha.classList.add('open');
+      } else {
+        captcha.classList.remove('open');
+      }
+    });
   }
 });
 
+
+
+// Form script
+const form = document.getElementById('form');
+const result = document.getElementById('result');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+
+  result.innerHTML = "Please wait..."
+
+    fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                result.innerHTML = "Thank you! Your message has been submitted successfully.";
+                form.reset();
+                setTimeout(closeForm, 3000);
+            } else {
+                result.innerHTML = "Please, solve the Captcha!";
+                
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            result.innerHTML = "Something went wrong!";
+        })
+        .then(function() {
+            setTimeout(() => {
+                result.style.display = "none";
+            }, 3000);
+        });
+});
+
+
+// SVG loader
 window.addEventListener('load', async function() {
   await loadSVGPaths('./logo/logo_snorklefudge.svg');  
 });
+
+
 
 // Toggle cursor function
 function toggleCursor() {
@@ -1145,6 +1324,8 @@ function animationLoop(timestamp) {
   }
 }
 
+
+
 // Start with a huge shape immediately (and ONLY one)
 createHugeShape();
 hugeShapeCount = 1; // Make sure counter is accurate
@@ -1154,8 +1335,10 @@ updateLogoParallax();
 
 // Start animation loop
 requestAnimationFrame(animationLoop);
-
 </script>
+
+<!--hCaptcha-->
+<script src="https://web3forms.com/client/script.js" async defer></script>
 
 </body>
 </html>
