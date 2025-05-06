@@ -1125,11 +1125,13 @@ function enableFocus(targetElement) {
 // Closing contact me window
 function closeForm() {
     formContainer.classList.remove('open');
-    messageButton.blur();
 }
 
 
+
+
 // ===== Event Handlers =====
+
 
 
 document.addEventListener('mousemove', e => {
@@ -1205,7 +1207,15 @@ messageButton.addEventListener('click', () => {
     result.style.display = "none";
     result.style.opacity = "1";
   }
+  setTimeout(() => {
+    // Focus on the first input field
+    const firstInput = formContainer.querySelector('input[type="text"], input[type="email"], textarea');
+    if (firstInput) {
+      firstInput.focus();
+    }
+  }, 100);
 });
+
 
 formContainer.addEventListener('mouseenter', () => {
   cursor.style.opacity = '0';
@@ -1215,22 +1225,26 @@ formContainer.addEventListener('mouseleave', () => {
   cursor.style.opacity = '1';
 });
 
+// Close on hitting escape
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && formContainer.classList.contains('open')) {
+    closeForm();
+  }
+});
+
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
 
   if (closeButton && formContainer) {
     closeButton.addEventListener('click', closeForm);
     
+    
     // Disable closeButton focus when hovering
     closeButton.addEventListener('mouseenter', () => disableFocus(closeButton));
     closeButton.addEventListener('mouseleave', () => enableFocus(closeButton));
     
-    // Close on hitting escape
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        closeForm();
-      }
-    });
     
     document.addEventListener('input', function() {
       const inputs = formContainer.querySelectorAll('input[type="text"], input[type="email"], textarea');
@@ -1243,7 +1257,10 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+
 });
+
 
 
 
