@@ -385,6 +385,7 @@
       padding: 0px;
       margin: 0;
 
+      transition: all 0.3s ease;
     }
 
     @keyframes floatUp {
@@ -1239,36 +1240,72 @@ form.addEventListener('submit', function(e) {
   e.preventDefault();
   const formData = new FormData(form);
 
-  result.innerHTML = "Please wait..."
+  // Show loading message
+  result.innerHTML = "Please wait...";
+  result.style.display = "block";
 
-    fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
+  // Check if hCaptcha is solved (if required)
+  const captchaResponse = formData.get('h-captcha-response');
+  if (captchaResponse === null || captchaResponse === '') {
+    // Add a check to see if captcha is required
+    const captchaEl = document.querySelector('.h-captcha');
+    if (captchaEl && captchaEl.classList.contains('open')) {
+      result.innerHTML = "Please solve the Captcha!";
+      return;
+    }
+  }
 
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                result.innerHTML = "Thank you! Your message has been submitted successfully.";
-                form.reset();
-                setTimeout(closeForm, 3000);
-            } else {
-                result.innerHTML = "Please, solve the Captcha!";
-                
-            }
-        })
-        .catch(error => {
-            console.log(error);
-            result.innerHTML = "Something went wrong!";
-        })
-        .then(function() {
-            setTimeout(() => {
-                result.style.display = "none";
-            }, 3000);
-        });
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Accept': 'application/json'
+    }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(data => {
+    if (data.success) {
+      result.innerHTML = "Thank you! Your message has been submitted successfully.";
+      form.reset();
+      
+      // Close the captcha if it was open
+      const captchaEl = document.querySelector('.h-captcha');
+      if (captchaEl) {
+      captchaEl.classList.remove('open');
+      }
+      
+      // Close form after a delay
+      setTimeout(closeForm, 3000);
+      
+    } else {
+      // Handle specific error cases from the API
+      if (data.message) {
+        result.innerHTML = data.message;
+      } else {
+        result.innerHTML = "Something went wrong with the submission.";
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    result.innerHTML = "Connection error! Please try again later.";
+  })
+  .finally(() => {
+    // Hide the result message after a delay
+    setTimeout(() => {
+      result.style.opacity = "0";
+      // Reset opacity after fade transition
+      setTimeout(() => {
+        result.style.display = "none";
+        result.style.opacity = "1";
+      }, 300);
+    }, 3000);
+  });
 });
 
 
