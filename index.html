@@ -242,7 +242,7 @@
 
     .form-container {
       position: fixed;
-      top: 65%;
+      top: 60%;
       left: 50%;
       transform: translateX(-50%);
       
@@ -263,7 +263,7 @@
     .form-container.open {
       opacity: 1;
       pointer-events: auto;
-      top: 38%;
+      top: 35%;
     }
 
     .form {
@@ -357,7 +357,6 @@
     }
 
     .h-captcha {
-      border: 4px solid blue;
       visibility: hidden;
       max-height: 0;
       opacity: 0;
@@ -443,6 +442,7 @@
   <form method="POST" class="form" id="form">
     <input type="hidden" name="access_key" value="64d7f524-4625-491a-bda9-fcecd641a2ce">
     <input type="hidden" name="from_name" value="Snorklefudge Page">
+    <input type="hidden" name="subject" value="">
     
     <div class="form-top" id="form-top">
       <button type="button" class="close-button" id="close-button">&times;</button>
@@ -1190,6 +1190,21 @@ messageButton.addEventListener('mouseleave', () => {
 
 messageButton.addEventListener('click', () => {
   formContainer.classList.add('open');
+  
+  // Check if hcaptcha exists in the global scope properly
+  if (typeof hcaptcha !== 'undefined' && hcaptcha) {
+    try {
+      hcaptcha.reset();
+    } catch (error) {
+      console.log("Error resetting hCaptcha:", error);
+    }
+  }
+  // Clear the result text
+  if (result) {
+    result.innerHTML = "";
+    result.style.display = "none";
+    result.style.opacity = "1";
+  }
 });
 
 formContainer.addEventListener('mouseenter', () => {
@@ -1239,6 +1254,11 @@ const result = document.getElementById('result');
 form.addEventListener('submit', function(e) {
   e.preventDefault();
   const formData = new FormData(form);
+  const name = formData.get('name');
+  const subject = `${name} sent a message!`;
+
+  // Append the custom subject to the form data
+  formData.append('subject', subject);
 
   // Show loading message
   result.innerHTML = "Please wait...";
@@ -1279,6 +1299,10 @@ form.addEventListener('submit', function(e) {
       captchaEl.classList.remove('open');
       }
       
+      if (window.hcaptcha) {
+        window.hcaptcha.reset();
+      }
+
       // Close form after a delay
       setTimeout(closeForm, 3000);
       
@@ -1289,11 +1313,17 @@ form.addEventListener('submit', function(e) {
       } else {
         result.innerHTML = "Something went wrong with the submission.";
       }
+      if (window.hcaptcha) {
+        window.hcaptcha.reset();
+      }
     }
   })
   .catch(error => {
     console.error('Error:', error);
     result.innerHTML = "Connection error! Please try again later.";
+    if (window.hcaptcha) {
+        window.hcaptcha.reset();
+    }
   })
   .finally(() => {
     // Hide the result message after a delay
