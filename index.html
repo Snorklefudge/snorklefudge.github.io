@@ -21,7 +21,7 @@
     
     a:focus {
       outline: none;
-      text-decoration: underline 3px;   
+      text-decoration: underline 3px !important;   
     }
 
     
@@ -1110,14 +1110,14 @@ async function loadSVGPaths(filename) {
   }
 }
 
-function disableFocus() {
-  document.addEventListener('focusin', function(event) {
+function disableFocus(targetElement) {
+  targetElement.addEventListener('focusin', function(event) {
     event.target.style.outline = 'none';
   });
 }
 
-function enableFocus() {
-  document.addEventListener('focusin', function(event) {
+function enableFocus(targetElement) {
+  targetElement.addEventListener('focusin', function(event) {
     event.target.style.outline = '';
   });
 }
@@ -1222,8 +1222,8 @@ document.addEventListener('DOMContentLoaded', function() {
     closeButton.addEventListener('click', closeForm);
     
     // Disable closeButton focus when hovering
-    closeButton.addEventListener('mouseenter', disableFocus);
-    closeButton.addEventListener('mouseleave', enableFocus);
+    closeButton.addEventListener('mouseenter', () => disableFocus(closeButton));
+    closeButton.addEventListener('mouseleave', () => enableFocus(closeButton));
     
     // Close on hitting escape
     document.addEventListener('keydown', e => {
