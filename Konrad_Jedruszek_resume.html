@@ -1,8 +1,16 @@
+<!-- Resume version: 2025.05 -->
+<!-- Last updated: May 12, 2025 -->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Konrad Jędruszek">
+    <meta name="description" content="3D Animator with expertise in character animation and game development">
+    <meta name="keywords" content="3D Animation, Game Development, Character Animation, Blender, Unity">
+    
     <title>Konrad Jędruszek - 3D Animator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <style>
@@ -242,6 +250,21 @@
             margin: 6px 0;
             font-size: 10pt;
         }
+
+        .print-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--accent);
+            color: whitesmoke;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #99998b;
+        }
         
         /* Print optimizations */
         @page {
@@ -263,6 +286,7 @@
             body {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+
             }
             
             .job {
@@ -276,6 +300,13 @@
             
             .skill-item:hover {
                 background-color: var(--accent-light) !important;
+            }
+            .print-hide {
+                display: none !important;
+            }  
+            
+            .job-description {
+                page-break-inside: avoid;
             }
         }
     </style>
@@ -296,7 +327,7 @@
                     <div class="details">
                         <ul>
                             <li><i class="fas fa-phone"></i> +48 730095031</li>
-                            <li><i class="fas fa-envelope"></i> <a href="mailto:hello@snorklefudge.com">hello@snorklefudge.com</a></li>
+                            <li><i class="fas fa-envelope"></i> <a href="mailto:hello@snorklefudge.com" aria-label="Email address: hello at snorklefudge dot com">hello@snorklefudge.com</a></li>
                             <li><i class="fas fa-map-marker-alt"></i> Włodowice, Poland</li>
                         </ul>
                     </div>
@@ -435,5 +466,6 @@
             </div>
         </div>
     </div>
+    <button onclick="window.print()" class="print-button print-hide">Save as PDF</button>
 </body>
 </html>
