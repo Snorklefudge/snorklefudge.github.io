@@ -9,7 +9,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      overflow: hidden;
+      overflow: auto;
       background-color: #FAF9F6;
       font-family: 'DM Mono', monospace;
 
@@ -47,7 +47,7 @@
     }
 
     .cursor-indicator {
-      position: absolute; 
+      position: fixed; 
       width: 28px;
       height: 28px;
       border-radius: 50%;
@@ -58,6 +58,8 @@
       transform: translate(-50%, -50%);
       display: block;
       opacity: 1;
+
+      pointer-events: none;
 
       transition: opacity 0.2s ease;
     }
@@ -79,7 +81,7 @@
 
     /* Logo container styles */
     .logo-container {
-      position: fixed;
+      position: absolute;
       top: 36%;
       left: 50%;
       width: 500px;
@@ -119,11 +121,10 @@
     }
     
     .buttons {
-      position: fixed;
-      top: 56%;
-      margin: auto;
+      position: absolute;
+      top: calc(36% + 250px);
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       z-index: 100;
       
       will-change: transform;
@@ -246,28 +247,33 @@
 
     .form-container {
       position: fixed;
-      top: 60%;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translate(-50%, -50%);
+      
+      max-height: 85vh;
+      max-width: 85vw;
+      overflow-y: auto;
       
       padding: 30px 40px;
       z-index: 200;
-
       
       background-color: #eff0e985;
       border-radius: 40px;
       cursor: auto !important;
 
       will-change: transform;
-      transition: opacity 0.2s, top 0.3s;
+      transition: opacity 0.2s, transform 0.3s;
+      
       opacity: 0;
       pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.95);
     }
 
     .form-container.open {
       opacity: 1;
       pointer-events: auto;
-      top: 25%;
+      transform: translate(-50%, -50%) scale(1); 
 
     }
 
@@ -361,12 +367,18 @@
     }
 
     .protected-email {
-      background-color: #868679ff;
+      border: 4px solid  #99998b;
+      background-color: none;
       padding: 10px 30px;
       border-radius: 26px;
       z-index: 201;
+      scale: 0.9;
 
-      color: whitesmoke;
+      backdrop-filter: blur(4px); /* Adjust the blur amount as needed */
+      -webkit-backdrop-filter: blur(4px);
+
+
+      color: #99998b;
       text-align: center;
       font-size: 18px;
       font-family: "Readex Pro", sans-serif;
@@ -374,12 +386,15 @@
       font-style: normal;
       letter-spacing: 2px;
       text-decoration: none;
-      transition: all 0.3s ease;
       transform-origin: left;
+      transition: all 0.2s ease;
     }
     
     .protected-email:hover {
       transform: scale(1.1);
+      color: whitesmoke;
+      background-color: #868679ff;
+      border: 4px solid #868679ff;
     }
 
     .h-captcha {
@@ -470,6 +485,7 @@
     <input type="hidden" name="from_name" value="Snorklefudge Page">
     <input type="hidden" name="subject" value="">
     
+    
     <div class="form-top" id="form-top">
       <a href="#" class="protected-email" 
       data-username="hello" 
@@ -481,10 +497,11 @@
     </div>
     
     <div class="form-input">
-      <div style="display: flex; flex-direction: row; gap: 24px;" >
-        <input type="text" name="name" placeholder="Name" class="form-text" required> 
-        <input type="email" name="email" placeholder="Email" class="form-text" required>
-      </div>
+      <div style="display: flex; flex-direction: row; gap: 24px; width: 100%; box-sizing: border-box;">
+    <input type="text" name="name" placeholder="Name" class="form-text" required style="flex: 1; min-width: 0; box-sizing: border-box; width: auto;"> 
+    
+    <input type="email" name="email" placeholder="Email" class="form-text" required style="flex: 1; min-width: 0; box-sizing: border-box; width: auto;">
+  </div>
       <textarea class="form-text" type="message" name="message" rows="10" style="width: 95%; padding: 20px 20px; font-weight: 300;" placeholder="Your message..." required></textarea>
     </div>
     <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
