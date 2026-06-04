@@ -457,7 +457,7 @@
 
 <div class="buttons" id="buttons">
   <div class="socials-container" id="socials-container">
-    <div class="socials-button" id="socials-button">Social Links</div>
+    <div class="socials-button" id="socials-button">Links</div>
     <div class="socials-links" id="social-links">
       <div class="social-link" id="social-link">
         <i class="fa-brands fa-linkedin" style="font-size: 25px;"></i>
@@ -470,6 +470,10 @@
       <div class="social-link" id="social-link">
         <i class="fa-solid fa-address-card" style="font-size: 21px;"></i>
         <a href="Konrad_Jedruszek_resume_en.html" target="_blank" rel="noopener noreferrer">Resume</a>
+      </div>
+      <div class="social-link" id="social-link">
+        <i class="fa-brands fa-google-drive" style="font-size: 21px;"></i>
+        <a href="https://drive.google.com/drive/folders/16BzWwiuFil4uXjzddDoUw_4p7odCFIik?usp=sharing" target="_blank" rel="noopener noreferrer">Previews</a>
       </div>
     </div>
 
@@ -556,6 +560,7 @@ const formContainer = document.getElementById('form-container');
 const closeButton = document.getElementById('close-button');
 const sendButton = document.getElementById('send-button');
 const captcha = document.querySelector('.h-captcha');
+const linksBox = document.getElementById('social-links');
 
 
 
@@ -1217,7 +1222,7 @@ document.addEventListener('keydown', e => {
 socialsContainer.addEventListener('mouseenter', () => {
   cursor.style.opacity = '0';
   messageButton.classList.remove('raised');
-  messageButton.style.transform = 'translateY(116px) scale(0.9)'
+  messageButton.style.transform = `translateY(${linksBox.offsetHeight - 45}px) scale(0.8)`;
   messageButton.style.opacity = '0.5';
 });
 
